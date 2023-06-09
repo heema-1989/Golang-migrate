@@ -11,5 +11,11 @@ func init() {
 	initializers.ConnectToDb()
 }
 func main() {
+	//sessionConf := &session.ManagerConfig{
+	//	CookieName: "beegoSessionID",
+	//	Gclifetime: 3600,
+	//}
+	//beego.GlobalSessions,_ = session.NewManager("memory", sessionConf)
+	//go beego.GlobalSessions.GC()
 	beego.Run()
 }

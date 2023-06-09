@@ -2,11 +2,9 @@ package controllers
 
 import (
 	"chat-application/initializers"
-	"chat-application/models"
 	users "chat-application/sqlc-models"
 	"chat-application/utils"
 	"context"
-	"encoding/json"
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 )
@@ -15,31 +13,44 @@ type RoomController struct {
 	beego.Controller
 }
 
+// URLMapping ...
+func (mapping *RoomController) URLMapping() {
+	mapping.Mapping("CreateRoom", mapping.CreateRoom)
+	mapping.Mapping("GetAllRooms", mapping.GetAllRooms)
+}
+
+// CreateRoom  ...
+// @Title Post
+// @Description create room
+// @Param	body		body 	users.Room	true		"body for add room content"
+// @Success 201 {object} users.Room
+// @Failure 403 body is empty
+// @router /create [post]
 func (room *RoomController) CreateRoom() {
 	var (
 		roomObj users.Room
-		resp    models.JsonResponse
 	)
 	if room.Ctx.Input.Method() == "POST" {
-		unmarshalErr := json.Unmarshal(room.Ctx.Input.RequestBody, &roomObj)
-		if unmarshalErr != nil {
-			resp = models.Response(406, "Something went wrong parsing data", make([]string, 0), resp)
-		} else {
-			result, createError := initializers.Db.CreateRoom(context.Background(), users.CreateRoomParams{
-				RoomName: roomObj.RoomName,
-				UserID:   roomObj.UserID,
-			})
-			utils.CheckError(createError, "Error creating records")
-			resp = models.Response(200, "Room successfully created", result, resp)
-		}
-		Send(&room.Controller, resp)
+		roomObj = room.FormParser(roomObj)
+		result, createError := initializers.Db.CreateRoom(context.Background(), users.CreateRoomParams{
+			RoomName: roomObj.RoomName,
+			UserID:   credentials.ID,
+		})
+		logs.Info(result)
+		utils.CheckError(createError, "Error creating records")
+
 	}
 }
 
+// GetAllRooms  ...
+// @Title Get
+// @Description Get room
+// @Success 200 {object} users.Room
+// @Failure 403
+// @router / [get]
 func (room *RoomController) GetAllRooms() {
 	var (
 		roomObj  []users.GetRoomsRow
-		resp     models.JsonResponse
 		getError error
 		found    bool
 	)
@@ -49,19 +60,22 @@ func (room *RoomController) GetAllRooms() {
 		return
 	}
 	if len(roomObj) == 0 {
-		resp = models.Response(200, "Records not found", make([]string, 0), resp)
+		found = false
 	} else {
 		found = true
-		resp = models.Response(200, "Records have been successfully retrieved", roomObj, resp)
 	}
 	room.Data["Found"] = found
-	room.Data["Rooms"] = resp.Data
-	//err := utils.ValidateJwt(credentials, credentials.JwtToken, loginKey)
-	//if err != nil {
-	//	logs.Info("Token expired")
-	//	return
-	//}
-	//room.Data["FullName"] = credentials.FullName
+	room.Data["Rooms"] = roomObj
+	logs.Info(credentials.ID)
+	room.Data["FullName"] = credentials.FullName
 	room.TplName = "default/home-page.html"
-	//Send(&room.Controller, resp)
+}
+func (room *RoomController) FormParser(roomObj users.Room) users.Room {
+	//parseErr := room.ParseForm(&roomObj)
+	//utils.CheckError(parseErr, "Error parsing form")
+	if room.Ctx.Input.Method() == "POST" {
+		roomObj.RoomName = room.GetString("room")
+		return roomObj
+	}
+	return users.Room{}
 }

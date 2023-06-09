@@ -24,7 +24,8 @@ func init() {
 	nsApi := beego.NewNamespace("/api",
 		beego.NSNamespace("/register", beego.NSInclude(&controllers.RegisterController{})),
 		beego.NSNamespace("/login", beego.NSInclude(&controllers.LoginController{})),
-		beego.NSNamespace("/home", beego.NSInclude(&controllers.LoginController{})),
+		beego.NSNamespace("/home", beego.NSInclude(&controllers.RoomController{})),
+		beego.NSNamespace("/chat", beego.NSInclude(&controllers.ChatController{})),
 	)
 	beego.AddNamespace(nsApi)
 }

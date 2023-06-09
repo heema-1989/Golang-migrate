@@ -7,6 +7,15 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["chat-application/controllers:ChatController"] = append(beego.GlobalControllerRouter["chat-application/controllers:ChatController"],
+		beego.ControllerComments{
+			Method:           "GetAllChat",
+			Router:           "/",
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 	beego.GlobalControllerRouter["chat-application/controllers:LoginController"] = append(beego.GlobalControllerRouter["chat-application/controllers:LoginController"],
 		beego.ControllerComments{
 			Method:           "Login",
@@ -47,6 +56,24 @@ func init() {
 		beego.ControllerComments{
 			Method:           "VerifiedUser",
 			Router:           "/verified",
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["chat-application/controllers:RoomController"] = append(beego.GlobalControllerRouter["chat-application/controllers:RoomController"],
+		beego.ControllerComments{
+			Method:           "GetAllRooms",
+			Router:           "/",
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["chat-application/controllers:RoomController"] = append(beego.GlobalControllerRouter["chat-application/controllers:RoomController"],
+		beego.ControllerComments{
+			Method:           "CreateRoom",
+			Router:           "/create",
 			AllowHTTPMethods: []string{"post"},
 			MethodParams:     param.Make(),
 			Filters:          nil,

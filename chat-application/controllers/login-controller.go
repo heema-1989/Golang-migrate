@@ -43,6 +43,7 @@ func (login *LoginController) Login() {
 	login.TplName = "default/login.html"
 	flag = true
 	check = true
+	println("djkddd")
 }
 
 // LoggedIn  ...
@@ -75,8 +76,9 @@ func (login *LoginController) LoggedIn() {
 		return
 	}
 	login.SetCredentialsTemplateNames(creds)
-	logs.Info(credentials)
-	login.TplName = "default/home-page.html"
+	logs.Info(creds)
+	credentials = creds
+	login.Redirect("http://localhost:8080/api/home", 302)
 }
 func (login *LoginController) SetCredentialsTemplateNames(credentials users.User) {
 	login.Data["VerifyId"] = credentials.VerifyID
@@ -84,7 +86,6 @@ func (login *LoginController) SetCredentialsTemplateNames(credentials users.User
 	login.Data["FullName"] = credentials.FullName
 	login.Data["Email"] = credentials.Email
 	login.Data["Password"] = credentials.Password
-	//login.Data["JwtToken"] = credentials.JwtToken
 }
 
 func (login *LoginController) FormParser(credentials users.User) users.User {
